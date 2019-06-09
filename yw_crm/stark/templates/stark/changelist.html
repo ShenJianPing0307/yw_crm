@@ -1,0 +1,215 @@
+{% extends 'layout.html' %}
+{% load stark %}
+
+{% block css %}
+    <style>
+
+    .table_content{
+        text-align: center;
+    }
+      .comb-search{
+            padding: 5px 20px;
+        }
+        .comb-search .row .whole {
+            width: 60px;
+            float: left;
+
+        }
+
+        .comb-search .row .others {
+            padding-left: 60px;
+        }
+
+        .comb-search .row a {
+            display: inline-block;
+            padding: 5px 8px;
+            margin: 3px;
+            border: 1px solid #d4d4d4;
+
+        }
+
+        .comb-search .row a {
+            display: inline-block;
+            padding: 5px 8px;
+            margin: 3px;
+            border: 1px solid #d4d4d4;
+        }
+
+        .comb-search a.active {
+            color: #fff;
+            background-color: #337ab7;
+            border-color: #2e6da4;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="comb-search">
+        {% for row in cl.list_filter_rows %}<!--前端渲染list_filter-->
+            <div class="row">
+                {% for obj in row %}
+                    {{ obj|safe }}
+                    {% endfor %}
+            </div>
+        {% endfor %}
+    </div>
+
+    {% if cl.add_btn %}
+        <div>
+    {{ cl.add_btn }}
+        </div>
+    {% endif %}
+    {% if cl.search_list %}
+        <div style="float: right">
+        <form method="get" class="form-inline" >
+        <div class="form-group" style="padding: 5px 0;">
+            <input class="form-control" type="text" name="q" value="{{ cl.q }}" placeholder="关键字搜索">
+            <button type="submit" class="btn btn-primary">
+                <i class="fa fa-search" aria-hidden="true"></i>
+            </button>
+        </div>
+        </form>
+        </div>
+    {% endif %}
+
+    <form method="post" class="form-inline">
+    {% csrf_token %}
+    {% if cl.action_list %}
+    <div class="form-group" style="padding: 5px 0">
+    <select id="action" name="action" class="form-control" style="min-width: 200px;">
+        <option value="">请选择相应的功能</option>
+        {% for item in cl.action_list %}
+                <option value="{{ item.name }}">{{ item.attr_dict.text }}</option>
+    </select>
+        {% if item.attr_dict.id %}
+        <input type="button" value="执行" id="{{ item.attr_dict.id }}" class="btn btn-primary">
+            {% else %}
+          <input type="submit" value="执行" class="btn btn-primary">
+        {% endif %}
+    {% endfor %}
+    </div>
+    {% endif %}
+    <table class="table table-hover table-bordered table_content">
+        <thead >
+            <tr>
+                   {% for row in cl.header_list %}
+                       <th class="table_content">{{ row }}</th>
+                        {% endfor %}
+            </tr>
+        </thead>
+    <tbody id="model_table_data">
+           {% for row_list in cl.body_list %}
+            <tr>
+           {% for val in row_list  %}
+               <td>{{ val }}</td>
+               {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+
+    </table>
+      <nav aria-label="Page navigation">
+                <ul class="pagination">
+                    {{ cl.page.page_html|safe }}
+                </ul>
+            </nav>
+    </form>
+        {% if cl.list_editable %}
+                            <div>
+{#                                <form method="post" onsubmit="return PrepareFormData(this)">#}
+{#                                <form method="post">#}
+{#                                    {% csrf_token %}#}
+{#                                    <button id='submit' class="btn btn-info pull-right" >Save</button>#}
+
+{#                                </form>#}
+                            </div>
+                        {% endif %}
+
+{% endblock %}
+{% block js %}
+    <script>
+    $(function () {
+        CheckBoxSelectAll();
+        SendData();
+    });
+    function CheckBoxSelectAll() {
+        $("#SelectAll").click(function () {
+            if($(this).prop('checked')){
+                $(this).parent().parent().parent().next().find('input[is_select="SelectEach"]').prop('checked',true);
+            }else {
+                $(this).parent().parent().parent().next().find('input[is_select="SelectEach"]').prop('checked',false);
+            }
+        })
+    }
+
+
+    function PrepareFormData(form_ele) {
+        var form_data = [];
+        $("#model_table_data tr").each(function () {
+            var obj_id = $(this).children().first().find("input").val();
+
+            if (obj_id){ //table obj row
+                var row_data = {};//all columns need to be updated
+                $(this).find("[data-tag='editable']").each(function () {
+                    {#alert($(this).attr("name") + "----" +$(this).val());#}
+                    var val=$(this).val();
+                    row_data[$(this).attr("name")] = $(this).val();
+                });//end find each
+                row_data['id'] = obj_id;
+
+                form_data.push(row_data);
+            }
+
+        });//end each
+
+        alert(JSON.stringify(form_data));
+
+        var ele = '<input type="hidden" name="editable_data" value=' + JSON.stringify(form_data) + ' >';
+        $(form_ele).append(ele);
+
+        return true;
+    }
+
+    function SendData() {
+        $('#submit').click(function () {
+
+            var $action_val=$('#action').val();
+            var form_data = [{"action":$action_val}];
+            $("#model_table_data tr").each(function () {
+                        var obj_id = $(this).children().first().find("input").val();
+                        if (obj_id){
+                            var row_data = {};
+                            $(this).find("[data-tag='editable']").each(function () {
+                                var val=$(this).val();
+                                row_data[$(this).attr("name")] = $(this).val();
+                            });//end find each
+                            row_data['id'] = obj_id;
+            
+                            form_data.push(row_data);
+
+                        }
+            
+                    });//end each
+            
+            {#alert(JSON.stringify(form_data));#}
+            $.ajax({
+                headers:{'X-CSRFToken':$.cookie('csrftoken')},
+                type:'POST',
+                dataType:"JSON",
+                contentType:"application/json",
+                 data:JSON.stringify(form_data),
+                success:function (arg) {
+                }
+                
+            })
+
+
+        })
+
+    }
+
+
+
+    </script>
+
+{% endblock %}

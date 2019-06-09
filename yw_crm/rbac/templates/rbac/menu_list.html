@@ -1,0 +1,153 @@
+{% extends 'layout.html' %}
+
+{% block css %}
+ <style>
+
+        .menu-area tr.active {
+            background-color: #f1f7fd;
+            border-left: 3px solid #fdc00f;
+        }
+        .hide{
+            display: none;
+        }
+</style>
+
+{% endblock %}
+
+{% block content %}
+    <div class="rbac_container">
+        <div class="col-md-4 menu-area">
+            <div class="panel panel-default">
+            <div class="panel-heading">
+                   <i class="fa fa-book" aria-hidden="true"></i> 菜单管理
+                    <a href="{% url 'rbac:menus_add' %}" class="right btn btn-success btn-xs"
+                       style="padding: 2px 8px;margin: -3px;">
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                        新建
+                    </a>
+            </div>
+                <table class="table table-hover table-bordered">
+                    <thead>
+                    <tr>
+                    <th>标题</th>
+                    <th>图标</th>
+                     <th>选项</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for row in menu_queryset %}
+                        {% if row.id|safe == pid %}
+                        <tr class="active">
+                        {% else %}
+                            <tr>
+                            {% endif %}
+                            <td><a href="?pid={{ row.id }}">{{ row.title }}({{ row.permission_set.count }})</a></td>
+                            <td><i class="{{ row.icon }}" aria-hidden="true"></i></td>
+                         <td>
+                    <a href="{% url 'rbac:menus_edit' mid=row.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                     <span style="padding: 2px 2px;display: inline-block">|</span>
+                    <a href="{% url 'rbac:menus_del' mid=row.id %}"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="col-md-8">
+             <div class="panel panel-default">
+            <div class="panel-heading">
+                   <i class="fa fa-book" aria-hidden="true"></i> 权限管理
+                <div class="btn-group right">
+                    <a href="{% url 'rbac:permissions_add' %}" class="right btn btn-success btn-xs"
+                       style="padding: 2px 8px;margin: -3px;">
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                        新建
+                    </a>
+                 <a href="{% url 'rbac:multi_permissions' %}" class="btn btn-xs btn-primary"
+                           style="padding: 2px 8px;margin: -3px;">
+                            <i class="fa fa-mail-forward" aria-hidden="true"></i>
+                            批量操作
+                 </a>
+                </div>
+            </div>
+                <table class="table table-hover table-bordered">
+                    <thead>
+                    <tr>
+                    <th>标题</th>
+                     <th>CODE</th>
+                    <th>url</th>
+                    <th>是否菜单</th>
+                        <th>所属菜单</th>
+                     <th>选项</th>
+                    </tr>
+                    </thead>
+                    <tbody id="permissionBody">
+                    {% for row in root_permission_dict.values %}
+                        <tr fid="{{ row.id }}">
+                            <td id="title">
+                                  <i class="fa fa-caret-down" aria-hidden="true"></i>
+                                {{ row.title }}
+                            </td>
+                            <td>{{ row.name }}</td>
+                            <td>{{ row.url }}</td>
+                            {% if row.menu_title %}
+                                <td>是</td>
+                            {% else %}
+                                <td></td>
+                            {% endif %}
+                            <td>{{ row.menu_title }}</td>
+                         <td>
+                    <a href="{% url 'rbac:permissions_edit' pid=row.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                     <span style="padding: 2px 2px;display: inline-block">|</span>
+                    <a href="{% url 'rbac:permissions_del' pid=row.id %}"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                </td>
+                        </tr>
+                        {% for child in row.children %}
+                            <tr class="node" cid="{{ row.id }}">
+                                <td class="title">{{ child.title }}</td>
+                                <td>{{ child.name }}</td>
+                                <td>{{ child.url }}</td>
+                                <td></td>
+                                <td></td>
+                                <td>
+                                      <a href="{% url 'rbac:permissions_edit' pid=child.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                                        <span style="padding: 2px 2px;display: inline-block">|</span>
+                                        <a href="{% url 'rbac:permissions_del' pid=child.id %}"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+
+    </div>
+
+
+{% endblock %}
+{% block js %}
+    <script>
+        $(function () {
+            bindPermission();
+        });
+    function bindPermission() {
+        $('#permissionBody').on('click','#title',function () {
+            var fid=$(this).parent().attr('fid');
+             if($(this).find('i').hasClass('fa fa-caret-down')){
+                 $(this).find('i').removeClass('fa fa-caret-down').addClass('fa fa-caret-right');
+                 $(this).parent().nextAll('tr[cid="'+fid+'"]').addClass('hide')
+            }
+            else {
+                $(this).find('i').removeClass('fa fa-caret-right').addClass('fa fa-caret-down');
+                 $(this).parent().nextAll('tr[cid="'+fid+'"]').removeClass('hide')
+            }
+        });
+    }
+    </script>
+
+{% endblock %}

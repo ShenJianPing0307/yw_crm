@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+
+    <form method="post">
+    {% csrf_token %}
+            <h4 class="page-header alert-danger">注意以下与{{ obj }}相关的信息都将被删除，请确认是否删除？</h4>
+
+        <a href="{{ cancel_url }}" class="btn btn-primary">取消</a>
+        <input type="submit" class="btn btn-danger" value="确认">
+    </form>
+ {% endblock %}

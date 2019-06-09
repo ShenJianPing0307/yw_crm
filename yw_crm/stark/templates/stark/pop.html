@@ -1,0 +1,12 @@
+{% extends 'layout.html' %}
+
+{% block js %}
+    <script>
+        (function () {
+            opener.get_data('{{ pop_post_id }}','{{ pk }}','{{ obj }}');
+            window.close()
+        })()
+
+    </script>
+
+{% endblock %}

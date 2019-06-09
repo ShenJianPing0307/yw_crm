@@ -1,0 +1,21 @@
+<table class="table table-hover table-bordered table_content">
+        <thead >
+
+            <tr>
+                   {% for row in header_list %}
+                       <th class="table_content">{{ row }}</th>
+                        {% endfor %}
+            </tr>
+        </thead>
+
+    <tbody>
+           {% for row_list in body_list %}
+            <tr>
+           {% for val in row_list  %}
+               <td>{{ val }}</td>
+               {% endfor %}
+            </tr>
+        {% endfor %}
+    </tbody>
+
+    </table>

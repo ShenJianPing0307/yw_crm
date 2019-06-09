@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+    <div style="margin-top: 20px">
+    <form method="post" class="form-horizontal" novalidate>
+    {% csrf_token %}
+     <div class="row">
+    <div class="form-group">
+    <label class="col-sm-2 control-label">角色名称</label>
+    <div class="col-sm-6">
+        {{ form.title }}<span style="color: red;display: inline-block">{{ form.title.errors.0 }}</span>
+    </div>
+  </div>
+     </div>
+    <div class="form-group">
+    <div class="col-sm-offset-2 col-sm-10">
+      <button type="submit" class="btn btn-primary">提交</button>
+    </div>
+  </div>
+
+
+
+    </form>
+     </div>
+{% endblock %}

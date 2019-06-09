@@ -1,0 +1,23 @@
+{% load stark %}
+<div class="row">
+    <div class="col-lg-6">
+        <input type="search" oninput="M2mSearch(this)" class="form-control">
+        <select id="id_{{ field.name }}_from" multiple class="multiselect" class="form-control">
+            {% for row in m2m_data %}
+                <option ondblclick="MoveElement(this,'id_{{ field.name }}_to')" value="{{ row.id }}">{{ row }}</option>
+            {% endfor %}
+        </select>
+        <p><a onclick="MoveAllElements('id_{{ field.name }}_from','id_{{ field.name }}_to')">全选</a></p>
+    </div>
+
+    <div class="col-lg-6">
+        <input type="search" oninput="M2mSearch(this)" class="form-control">
+        <select id="id_{{ field.name }}_to" selected_data="selected_m2m" multiple class="multiselect" name="{{ field.name }}" class="form-control">
+            {% for row in m2m_un_data %}
+                <option ondblclick="MoveElement(this,'id_{{ field.name }}_from')"
+                        value="{{ row.id }}">{{ row }}</option>
+            {% endfor %}
+        </select>
+        <p><a onclick="MoveAllElements('id_{{ field.name }}_to','id_{{ field.name }}_from')">移除</a></p>
+    </div>
+</div>

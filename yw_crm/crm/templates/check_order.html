@@ -1,0 +1,39 @@
+{% extends 'layout.html' %}
+
+
+{% block content %}
+        <form method="post">
+            {% csrf_token %}
+            {{ formset.management_form }}
+            <div style="margin: 5px 0">
+                <input type="submit" value="保存" class="btn btn-success">
+            </div>
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>客户</th>
+                    <th>购买的产品</th>
+                    <th>咨询顾问</th>
+                    <th>产品数量</th>
+                    <th>审核日期</th>
+                    <th>交货日期</th>
+                    <th>备注</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for form in formset %}
+                    <tr>
+                        {{ form.id }}
+                        <td>{{ form.customer }}</td>
+                        <td>{{ form.product }}</td>
+                        <td>{{ form.consultant }}</td>
+                        <td>{{ form.quantity }}</td>
+                        <td>{{ form.check_date }} <span style="color: red">{{ form.check_date.errors.0 }}</span></td>
+                        <td>{{ form.delivery_date }}</td>
+                        <td>{{ form.note }}</td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </form>
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'layout.html' %}
+{% block css %}
+
+
+{% endblock %}
+{% block content %}
+    <div class="role_list">
+    <div class="container">
+        <a href="{% url 'rbac:roles_add' %}" class="btn btn-primary add_role">添加角色</a>
+        <table class="table table-hover table-bordered">
+            <thead>
+            <tr>
+                <td>角色ID</td>
+                <td>角色名称</td>
+                <td>权限个数</td>
+                <td>操作</td>
+            </tr>
+            </thead>
+            <tbody>
+            {% for row in role_queryset %}
+            <tr>
+                <td>{{ row.id }}</td>
+                <td>{{ row.title }}</td>
+                <td>{{ row.permissions.count }}</td>
+                <td>
+                    <a href="{% url 'rbac:roles_edit' rid=row.id %}"><i class="fa fa-pencil" aria-hidden="true"></i></a>
+                     <span style="padding: 2px 2px;display: inline-block">|</span>
+                    <a href="{% url 'rbac:roles_del' rid=row.id %}"><i class="fa fa-trash" aria-hidden="true"></i></a>
+                </td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    </div>
+{% endblock %}
