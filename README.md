@@ -14,3 +14,24 @@
 - 安装Django2.0
 
 ## 运行
+
+修改`yw_crm/setting.py` 数据库配置，如下所示：
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'yw_crm',
+        'USER': 'root',
+        'PASSWORD': '',
+        'HOST': 'localhost',
+        'PORT': '3306',
+    }
+}
+```
+生成数据库表：
+```shell
+python manage.py makemigrations
+python manage.py migrate
+```
+
+
